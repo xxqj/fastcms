@@ -1,0 +1,114 @@
+package com.fast.web.controller;
+
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.util.Assert;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.fast.common.exception.ServiceException;
+import com.fast.common.model.Resource;
+import com.fast.common.service.IResourceService;
+import com.fast.web.model.Result;
+
+
+
+@Controller
+public class ResourceController {
+	
+	private static final Logger logger = Logger.getLogger(ResourceController.class.getName());
+	
+	@Autowired
+	private IResourceService resourceService;
+	
+	
+	
+	
+	@RequestMapping(value = "/admin/addResource.do")
+	@ResponseBody
+	public Result addResource(HttpServletRequest request,
+                              HttpServletResponse response, HttpSession session)
+	{
+		  Result rs=new Result();
+		  HttpServletRequest req=(HttpServletRequest) request;
+		  
+		  String functionName=req.getParameter("functionName");
+		  String functionUrl=req.getParameter("functionUrl");
+		  String functionDesc=req.getParameter("functionDesc");
+		  String pid= req.getParameter("pid");
+		  String postion= req.getParameter("postion");
+		  
+		  Assert.notNull(functionName);
+		  Assert.notNull(functionUrl);
+		  Assert.notNull(pid);
+		  
+		  Resource entity=new Resource();
+		  entity.setFunctionName(functionName);
+		  entity.setFunctionUrl(functionUrl);
+		  entity.setPid(pid);
+		  entity.setFunctionDesc(functionDesc);
+		  entity.setPostion(postion);
+		  
+		  try{
+			  resourceService.insert(entity);
+			  rs.setStatus(Result.Status.OK);
+			  rs.setMessage("菜单创建成功");
+			  
+		     }catch(Exception e){
+			  rs.setStatus(Result.Status.ERROR);
+			  rs.setMessage("菜单创建失败");
+		     }
+		  
+		  return rs;
+	}
+	
+	@RequestMapping(value = "/admin/getParentNode.do")
+	@ResponseBody
+	public Result getParentNode(HttpServletRequest request,
+                              HttpServletResponse response, HttpSession session)
+	{
+		  Result rs=new Result();
+          //HttpServletRequest req=(HttpServletRequest) request;
+		  
+		  //String functionName=req.getParameter("0");
+		  try{
+			   List<Resource> resours=resourceService.getParentNode(Resource.SUPER_PID);
+			   rs.setData(resours);
+			   rs.setStatus(Result.Status.OK);
+		     }catch(ServiceException e){
+			   rs.setStatus(Result.Status.ERROR);
+		     }
+		  
+		  return rs;
+	}
+	
+	@RequestMapping(value = "/admin/getAllResources.do")
+	@ResponseBody
+	public Result getAllResources(HttpServletRequest request,
+                              HttpServletResponse response, HttpSession session)
+	{
+		  Result rs=new Result();
+          //HttpServletRequest req=(HttpServletRequest) request;
+		  
+		  //String functionName=req.getParameter("0");
+		  try{
+			   List<Resource> resours=resourceService.queryAll();
+			   rs.setData(resours);
+			   rs.setStatus(Result.Status.OK);
+		     }catch(ServiceException e){
+			   rs.setStatus(Result.Status.ERROR);
+		     }
+		  
+		  return rs;
+	}
+	
+	
+	
+}

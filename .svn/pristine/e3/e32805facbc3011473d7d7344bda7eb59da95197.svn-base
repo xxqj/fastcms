@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.fast.common.model.Role">
+   <cache type="org.mybatis.caches.ehcache.LoggingEhcache" readOnly="true"/>
+   <resultMap id="RoleResultMap" type="com.fast.common.model.Role">
+		<id column="rid" property="rid" jdbcType="VARCHAR"/>
+		<result column="rname" property="rname" jdbcType="VARCHAR"/>
+		<result column="remark" property="remark" jdbcType="VARCHAR"/>
+   </resultMap>
+   
+   <sql id="Base_Column_List">
+		rid as rid,
+		rname as rname,
+		remark as remark
+	</sql>
+   
+   <sql id="Base_Where_Clause">
+		<where>
+			<trim prefixOverrides="and">
+				<if test="rid != null"> and rid = #{rid}</if>
+				<if test="rname != null">and rname = #{rname}</if>
+				<if test="remark != null">and remark = #{remark}</if>
+				<!-- 模糊查询 -->
+				<if test="rname != null">and rname like CONCAT("%",#{rname},"%")</if>
+			</trim>
+		</where>
+		<if test="sorting != null">order by ${rname}</if>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</sql>
+	
+	<!-- 查询总数 -->
+	<select id="selectCount" resultType="java.lang.Long" parameterType="java.util.Map">
+		select count(rid)
+		from t_role
+		<include refid="Base_Where_Clause" />
+	</select>
+	
+	<!-- 查询 -->
+	<select id="select" resultMap="RoleResultMap" parameterType="java.util.Map">
+		select
+		<include refid="Base_Column_List" />
+		from t_role
+		<include refid="Base_Where_Clause" />
+	</select>
+	
+	<!-- 根据ID查询 -->
+	<select id="selectById" resultMap="RoleResultMap" parameterType="java.lang.String">
+		select
+		<include refid="Base_Column_List" />
+		from t_role
+		where rid = #{rid}
+	</select>
+	
+	<!-- 根据ID删除 -->
+	<delete id="deleteById" parameterType="java.lang.String">
+		delete from t_role
+		where rid = #{rid}
+	</delete>
+	
+	<!-- 删除 -->
+	<delete id="delete" parameterType="java.util.Map">
+		delete from t_role
+		<include refid="Base_Where_Clause" />
+	</delete>
+
+	<!-- 添加 -->	
+	<insert id="insert" parameterType="com.fast.web.model.RoleVo">
+		insert into t_role(
+			rname,
+		    remark
+		)
+		values (
+			#{rname}, 
+			#{remark}
+		)
+	</insert>
+	
+	
+	<!-- 通过ID更新 -->
+	<update id="updateByIdSelective" parameterType="com.fast.web.model.RoleVo">
+		update t_role
+		<set>
+			<if test="rname != null">rname = #{rname},</if>
+			<if test="remark != null">remark = #{remark}</if>
+		</set>
+		where rid = #{rid}
+	</update>
+	
+	<update id="updateById" parameterType="com.fast.web.model.RoleVo">
+		update t_role
+		set rname = #{rname},
+		remark = #{remark}
+		where rid = #{rid}
+	</update>
+	
+	
+</mapper>

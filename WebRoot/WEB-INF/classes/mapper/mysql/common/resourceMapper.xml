@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fast.common.model.Resource">
+   <cache type="org.mybatis.caches.ehcache.LoggingEhcache" readOnly="true"/>
+   <resultMap id="ResourceResultMap" type="com.fast.common.model.Resource">
+		<id column="fid" property="fid" jdbcType="VARCHAR"/>
+		<result column="function_name" property="functionName" jdbcType="VARCHAR" />
+		<result column="function_url" property="functionUrl" jdbcType="VARCHAR" />
+		<result column="pid" property="pid" jdbcType="VARCHAR" />
+   </resultMap>
+	
+	 <sql id="Base_Column_List">
+		fid as fid,
+		function_name as functionName,
+		function_url as functionUrl,
+		function_desc as functionDesc,
+		pid as pid,
+		postion as postion
+	</sql>
+   
+   <sql id="Base_Where_Clause">
+		<where>
+			<trim prefixOverrides="and">
+				<if test="fid != null"> and fid = #{fid}</if>
+				<if test="functionName != null">and function_name = #{functionName}</if>
+				<if test="functionUrl != null">and function_url = #{functionUrl}</if>
+				<if test="pid != null">and pid = #{pid}</if>
+				<if test="postion != null">and postion = #{postion}</if>
+				<!-- 模糊查询 -->
+				<if test="functionName != null">and function_name like CONCAT("%",#{functionName},"%")</if>
+			</trim>
+		</where>
+		<if test="sorting != null">order by ${postion}</if>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</sql>
+	
+	<!-- 查询总数 -->
+	<select id="selectCount" resultType="java.lang.Long" parameterType="java.util.Map">
+		select count(fid)
+		from t_resource
+		<include refid="Base_Where_Clause" />
+	</select>
+	
+	<!-- 查询 -->
+	<select id="select" resultMap="ResourceResultMap" parameterType="java.util.Map">
+		select
+		<include refid="Base_Column_List" />
+		from t_resource
+		<include refid="Base_Where_Clause" />
+	</select>
+	
+	<!-- 根据ID查询 -->
+	<select id="selectById" resultMap="ResourceResultMap" parameterType="java.lang.String">
+		select
+		<include refid="Base_Column_List" />
+		from t_resource
+		where fid = #{fid}
+		order by postion
+	</select>
+	
+	<!-- 根据ID查询父节点 -->
+	<select id="selectByPid" resultMap="ResourceResultMap" parameterType="java.lang.String">
+		select
+		<include refid="Base_Column_List" />
+		from t_resource
+		where pid = #{pid}
+		order by postion
+	</select>
+	
+	<!-- 根据ID删除 -->
+	<delete id="deleteById" parameterType="java.lang.String">
+		delete from t_resource
+		where fid = #{fid}
+	</delete>
+	
+	<!-- 删除 -->
+	<delete id="delete" parameterType="java.util.Map">
+		delete from t_resource
+		<include refid="Base_Where_Clause" />
+	</delete>
+
+	<!-- 添加 -->	
+	<insert id="insert" parameterType="com.fast.web.model.ResourceVo">
+		insert into t_resource(
+			function_name,
+		    function_url,
+		    function_desc,
+		    pid,
+		    postion
+		)
+		values (
+			#{functionName}, 
+			#{functionUrl},
+			#{functionDesc}, 
+			#{pid},
+			#{postion}
+		)
+	</insert>
+	
+	
+	<!-- 通过ID更新 -->
+	<update id="updateByIdSelective" parameterType="com.fast.web.model.ResourceVo">
+		update t_resource
+		<set>
+			<if test="functionName != null">function_name = #{functionName}</if>
+			<if test="functionUrl != null">function_url = #{functionUrl}</if>
+			<if test="functionDesc != null">function_name = #{functionDesc}</if>
+			<if test="pid != null">pid = #{pid}</if>
+			<if test="postion != null">postion = #{postion}</if>
+		</set>
+		where fid = #{fid}
+	</update>
+	
+	<update id="updateById" parameterType="com.fast.web.model.ResourceVo">
+		update t_resource
+		set function_name = #{functionName},
+		function_url = #{functionUrl},
+		function_desc=#{functionDesc}#,
+		pid=#{pid}#,
+		postion = #{postion}
+		where fid = #{fid}
+	</update>
+	
+	
+</mapper>

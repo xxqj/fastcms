@@ -1,0 +1,25 @@
+function locationURL() {
+    var curwwwpath = window.document.location.href;
+    var pathname = window.document.location.pathname;
+    var pos = curwwwpath.indexOf(pathname);
+    var localhostpath = curwwwpath.substring(0, pos);;
+    var projectname = pathname.substring(0, pathname.substr(1).indexOf('/') + 1);
+    return (localhostpath + projectname);
+}
+ 
+$(function(){
+ var allPage=$('#allPage').val();
+ var allRows=$('#allRows').val();
+ var rows=$('#rows').val();
+ var page=$('#page').val(); 
+ var ctitle=$('#ctitle').val();
+ var ctype=$('#ctype').val();
+   $('.leftPageDiv').text('共'+allRows+'条记录，当前显示第 '+page+'/'+allPage+' 页');
+   $(".rightPageDiv").createPage({
+        pageCount:allPage,
+        current:page,
+        backFn:function(p){
+           window.location.href= locationURL() +'/content/Content/getContentPageInfo?ctitle='+ctitle+'&ctype='+ctype+'&page='+p+'&rows='+rows;
+        }
+    }); 
+})
